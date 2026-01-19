@@ -1,12 +1,16 @@
 import { Milestone } from '@/data/ministryData';
+import { useMinistryData } from '@/contexts/MinistryDataContext';
+import { EditableCell } from './EditableCell';
 import { Target } from 'lucide-react';
 
 interface MilestoneCardProps {
   milestone: Milestone;
+  index: number;
   delay?: number;
 }
 
-export const MilestoneCard = ({ milestone, delay = 0 }: MilestoneCardProps) => {
+export const MilestoneCard = ({ milestone, index, delay = 0 }: MilestoneCardProps) => {
+  const { isEditMode, updateMilestone } = useMinistryData();
   const percentage = Math.min((milestone.current / milestone.target) * 100, 100);
   const isComplete = milestone.current >= milestone.target;
 
@@ -22,7 +26,16 @@ export const MilestoneCard = ({ milestone, delay = 0 }: MilestoneCardProps) => {
         <div>
           <h3 className="font-semibold text-foreground">{milestone.label}</h3>
           <p className="text-sm text-muted-foreground">
-            Road to: <span className="font-bold text-accent">{milestone.target.toLocaleString()}</span>
+            Road to:{' '}
+            {isEditMode ? (
+              <EditableCell 
+                value={milestone.target} 
+                onSave={(v) => updateMilestone(index, 'target', v)}
+                className="font-bold text-accent"
+              />
+            ) : (
+              <span className="font-bold text-accent">{milestone.target.toLocaleString()}</span>
+            )}
           </p>
         </div>
       </div>
@@ -35,9 +48,17 @@ export const MilestoneCard = ({ milestone, delay = 0 }: MilestoneCardProps) => {
       </div>
 
       <div className="flex justify-between items-center">
-        <span className="text-2xl font-bold font-display text-foreground">
-          {milestone.current.toLocaleString()}
-        </span>
+        {isEditMode ? (
+          <EditableCell 
+            value={milestone.current} 
+            onSave={(v) => updateMilestone(index, 'current', v)}
+            className="text-2xl font-bold font-display text-foreground"
+          />
+        ) : (
+          <span className="text-2xl font-bold font-display text-foreground">
+            {milestone.current.toLocaleString()}
+          </span>
+        )}
         <span className={`metric-badge ${isComplete ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
           {percentage.toFixed(1)}%
         </span>

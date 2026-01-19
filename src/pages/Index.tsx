@@ -1,20 +1,14 @@
 import { Users, Heart, BookOpen, School, MapPin, UserCheck } from 'lucide-react';
+import { MinistryDataProvider, useMinistryData } from '@/contexts/MinistryDataContext';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { MetricKey } from '@/components/dashboard/MetricKey';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
-import { 
-  term1Data, 
-  term2Data, 
-  term3Data, 
-  milestones, 
-  yearComparisons,
-  getGrandTotals 
-} from '@/data/ministryData';
 
-const Index = () => {
+const DashboardContent = () => {
+  const { term1Data, term2Data, term3Data, milestones, yearComparisons, getGrandTotals } = useMinistryData();
   const grandTotals = getGrandTotals();
 
   return (
@@ -88,6 +82,7 @@ const Index = () => {
               <MilestoneCard 
                 key={milestone.label} 
                 milestone={milestone}
+                index={index}
                 delay={index * 100}
               />
             ))}
@@ -117,6 +112,14 @@ const Index = () => {
         </footer>
       </div>
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <MinistryDataProvider>
+      <DashboardContent />
+    </MinistryDataProvider>
   );
 };
 
