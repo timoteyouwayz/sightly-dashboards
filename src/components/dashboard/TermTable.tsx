@@ -1,4 +1,6 @@
 import { TermData } from '@/data/ministryData';
+import { useMinistryData } from '@/contexts/MinistryDataContext';
+import { EditableCell } from './EditableCell';
 import {
   Table,
   TableBody,
@@ -14,6 +16,12 @@ interface TermTableProps {
 }
 
 export const TermTable = ({ data, delay = 0 }: TermTableProps) => {
+  const { updateTermData } = useMinistryData();
+
+  const handleUpdate = (monthIndex: number, field: string, value: number) => {
+    updateTermData(data.term, monthIndex, field, value);
+  };
+
   return (
     <div 
       className="card-elevated overflow-hidden animate-fade-in"
@@ -44,12 +52,48 @@ export const TermTable = ({ data, delay = 0 }: TermTableProps) => {
                 className="hover:bg-muted/50 transition-colors"
               >
                 <TableCell className="font-medium text-primary">{month.month}</TableCell>
-                <TableCell className="text-right font-mono">{month.reached.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-success">{month.bornAgain.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-info">{month.discipled.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-warning">{month.schools.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-accent">{month.counties.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono">{month.partnersTrained.toLocaleString()}</TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.reached} 
+                    onSave={(v) => handleUpdate(index, 'reached', v)}
+                    className="font-mono"
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.bornAgain} 
+                    onSave={(v) => handleUpdate(index, 'bornAgain', v)}
+                    className="font-mono text-success"
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.discipled} 
+                    onSave={(v) => handleUpdate(index, 'discipled', v)}
+                    className="font-mono text-info"
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.schools} 
+                    onSave={(v) => handleUpdate(index, 'schools', v)}
+                    className="font-mono text-warning"
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.counties} 
+                    onSave={(v) => handleUpdate(index, 'counties', v)}
+                    className="font-mono text-accent"
+                  />
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditableCell 
+                    value={month.partnersTrained} 
+                    onSave={(v) => handleUpdate(index, 'partnersTrained', v)}
+                    className="font-mono"
+                  />
+                </TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-semibold border-t-2 border-primary/20">

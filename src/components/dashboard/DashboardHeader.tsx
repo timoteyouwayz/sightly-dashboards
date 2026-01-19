@@ -1,6 +1,9 @@
 import { Calendar, BarChart3 } from 'lucide-react';
+import { EditModeToggle } from './EditModeToggle';
+import { useMinistryData } from '@/contexts/MinistryDataContext';
 
 export const DashboardHeader = () => {
+  const { isEditMode } = useMinistryData();
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -21,11 +24,21 @@ export const DashboardHeader = () => {
             <p className="text-muted-foreground">Tracking Board Dashboard</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">{currentDate}</span>
+        <div className="flex items-center gap-3">
+          <EditModeToggle />
+          <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">{currentDate}</span>
+          </div>
         </div>
       </div>
+      {isEditMode && (
+        <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <p className="text-sm text-primary">
+            <strong>Edit Mode:</strong> Click on any number in the tables or milestones to edit it. Changes auto-save when you click away or press Enter.
+          </p>
+        </div>
+      )}
     </header>
   );
 };
