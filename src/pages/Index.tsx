@@ -6,9 +6,10 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
+import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
 
 const DashboardContent = () => {
-  const { term1Data, term2Data, term3Data, milestones, yearComparisons, getGrandTotals } = useMinistryData();
+  const { term1Data, term2Data, term3Data, milestones, getGrandTotals } = useMinistryData();
   const grandTotals = getGrandTotals();
 
   return (
@@ -74,13 +75,16 @@ const DashboardContent = () => {
 
         {/* Milestones */}
         <section className="mb-8">
-          <h2 className="text-xl font-display font-semibold text-foreground mb-4">
-            Milestones
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-display font-semibold text-foreground">
+              Milestones
+            </h2>
+            <AddMilestoneDialog />
+          </div>
           <div className="grid md:grid-cols-3 gap-4">
             {milestones.map((milestone, index) => (
               <MilestoneCard 
-                key={milestone.label} 
+                key={`${milestone.label}-${index}`} 
                 milestone={milestone}
                 index={index}
                 delay={index * 100}
@@ -103,7 +107,7 @@ const DashboardContent = () => {
 
         {/* Year Comparison */}
         <section className="mb-8">
-          <YearComparisonChart data={yearComparisons} delay={300} />
+          <YearComparisonChart delay={300} />
         </section>
 
         {/* Footer */}

@@ -1,6 +1,8 @@
 import { TermData } from '@/data/ministryData';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { EditableCell } from './EditableCell';
+import { RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -16,7 +18,7 @@ interface TermTableProps {
 }
 
 export const TermTable = ({ data, delay = 0 }: TermTableProps) => {
-  const { updateTermData } = useMinistryData();
+  const { updateTermData, resetTermData, isEditMode } = useMinistryData();
 
   const handleUpdate = (monthIndex: number, field: string, value: number) => {
     updateTermData(data.term, monthIndex, field, value);
@@ -27,10 +29,22 @@ export const TermTable = ({ data, delay = 0 }: TermTableProps) => {
       className="card-elevated overflow-hidden animate-fade-in"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="p-4 border-b border-border bg-muted/30">
+      <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
         <h3 className="font-display font-semibold text-lg text-foreground">
           Term {data.term}
         </h3>
+        {isEditMode && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => resetTermData(data.term)}
+            className="text-muted-foreground hover:text-destructive gap-1"
+            title="Reset all values to zero"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset
+          </Button>
+        )}
       </div>
       <div className="overflow-x-auto">
         <Table>

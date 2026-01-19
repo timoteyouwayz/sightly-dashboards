@@ -1,7 +1,8 @@
 import { Milestone } from '@/data/ministryData';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { EditableCell } from './EditableCell';
-import { Target } from 'lucide-react';
+import { Target, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MilestoneCardProps {
   milestone: Milestone;
@@ -10,15 +11,26 @@ interface MilestoneCardProps {
 }
 
 export const MilestoneCard = ({ milestone, index, delay = 0 }: MilestoneCardProps) => {
-  const { isEditMode, updateMilestone } = useMinistryData();
+  const { isEditMode, updateMilestone, deleteMilestone } = useMinistryData();
   const percentage = Math.min((milestone.current / milestone.target) * 100, 100);
   const isComplete = milestone.current >= milestone.target;
 
   return (
     <div 
-      className="card-elevated p-6 animate-fade-in"
+      className="card-elevated p-6 animate-fade-in relative group"
       style={{ animationDelay: `${delay}ms` }}
     >
+      {isEditMode && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => deleteMilestone(index)}
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      )}
+
       <div className="flex items-center gap-3 mb-4">
         <div className={`p-2 rounded-lg ${isComplete ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
           <Target className="w-5 h-5" />
