@@ -20,6 +20,12 @@ interface MinistryDataContextType {
   setIsEditMode: (value: boolean) => void;
   updateTermData: (term: number, monthIndex: number, field: string, value: number) => void;
   updateMilestone: (index: number, field: 'current' | 'target', value: number) => void;
+  addMilestone: (milestone: Milestone) => void;
+  deleteMilestone: (index: number) => void;
+  addYearComparison: (year: YearComparison) => void;
+  updateYearComparison: (index: number, field: string, value: number) => void;
+  deleteYearComparison: (index: number) => void;
+  resetTermData: (term: number) => void;
   getGrandTotals: () => {
     reached: number;
     bornAgain: number;
@@ -51,7 +57,7 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
   const [term2Data, setTerm2Data] = useState<TermData>(initialTerm2);
   const [term3Data, setTerm3Data] = useState<TermData>(initialTerm3);
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones);
-  const [yearComparisons] = useState<YearComparison[]>(initialYearComparisons);
+  const [yearComparisons, setYearComparisons] = useState<YearComparison[]>(initialYearComparisons);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const updateTermData = (term: number, monthIndex: number, field: string, value: number) => {
@@ -70,12 +76,56 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
     else if (term === 3) setTerm3Data(updateTerm);
   };
 
+  const resetTermData = (term: number) => {
+    const createEmptyTerm = (termNum: number, months: string[]): TermData => ({
+      term: termNum,
+      months: months.map(month => ({
+        month,
+        reached: 0,
+        bornAgain: 0,
+        discipled: 0,
+        schools: 0,
+        counties: 0,
+        partnersTrained: 0,
+      })),
+      totals: { reached: 0, bornAgain: 0, discipled: 0, schools: 0, counties: 0, partnersTrained: 0 },
+    });
+
+    if (term === 1) setTerm1Data(createEmptyTerm(1, ['Jan', 'Feb', 'Mar', 'Apr']));
+    else if (term === 2) setTerm2Data(createEmptyTerm(2, ['May', 'Jun', 'Jul', 'Aug']));
+    else if (term === 3) setTerm3Data(createEmptyTerm(3, ['Sep', 'Oct', 'Nov', 'Dec']));
+  };
+
   const updateMilestone = (index: number, field: 'current' | 'target', value: number) => {
     setMilestones(prev => {
       const newMilestones = [...prev];
       newMilestones[index] = { ...newMilestones[index], [field]: value };
       return newMilestones;
     });
+  };
+
+  const addMilestone = (milestone: Milestone) => {
+    setMilestones(prev => [...prev, milestone]);
+  };
+
+  const deleteMilestone = (index: number) => {
+    setMilestones(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addYearComparison = (year: YearComparison) => {
+    setYearComparisons(prev => [...prev, year].sort((a, b) => a.year - b.year));
+  };
+
+  const updateYearComparison = (index: number, field: string, value: number) => {
+    setYearComparisons(prev => {
+      const newYears = [...prev];
+      newYears[index] = { ...newYears[index], [field]: value };
+      return newYears;
+    });
+  };
+
+  const deleteYearComparison = (index: number) => {
+    setYearComparisons(prev => prev.filter((_, i) => i !== index));
   };
 
   const getGrandTotals = () => ({
@@ -99,6 +149,12 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
         setIsEditMode,
         updateTermData,
         updateMilestone,
+        addMilestone,
+        deleteMilestone,
+        addYearComparison,
+        updateYearComparison,
+        deleteYearComparison,
+        resetTermData,
         getGrandTotals,
       }}
     >
