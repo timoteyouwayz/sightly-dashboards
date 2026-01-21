@@ -1,5 +1,6 @@
 import { Calendar, BarChart3 } from 'lucide-react';
 import { EditModeToggle } from './EditModeToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 
 export const DashboardHeader = () => {
@@ -25,6 +26,7 @@ export const DashboardHeader = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <EditModeToggle />
           <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
             <Calendar className="w-4 h-4 text-muted-foreground" />
