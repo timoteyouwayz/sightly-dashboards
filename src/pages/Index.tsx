@@ -7,9 +7,11 @@ import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
 import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
+import { useEditShortcut } from '@/hooks/useEditShortcut';
 
 const DashboardContent = () => {
   const { term1Data, term2Data, term3Data, milestones, getGrandTotals } = useMinistryData();
+  useEditShortcut();
   const grandTotals = getGrandTotals();
 
   return (
