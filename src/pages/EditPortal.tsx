@@ -7,6 +7,7 @@ import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
 import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
+import { AddYearDialog } from '@/components/dashboard/AddYearDialog';
 
 const EditPortal = () => {
   const { term1Data, term2Data, term3Data, milestones, getGrandTotals, setIsEditMode } = useMinistryData();
