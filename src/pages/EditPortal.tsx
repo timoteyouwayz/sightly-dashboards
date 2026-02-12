@@ -1,20 +1,36 @@
+import { useEffect } from 'react';
 import { Users, Heart, BookOpen, School, Briefcase, UserCheck } from 'lucide-react';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { MetricKey } from '@/components/dashboard/MetricKey';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
+import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
+import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
 
-const Index = () => {
-  const { term1Data, term2Data, term3Data, milestones, getGrandTotals } = useMinistryData();
+const EditPortal = () => {
+  const { term1Data, term2Data, term3Data, milestones, getGrandTotals, setIsEditMode } = useMinistryData();
   const grandTotals = getGrandTotals();
+
+  // Always enable edit mode on this page
+  useEffect(() => {
+    setIsEditMode(true);
+    return () => setIsEditMode(false);
+  }, [setIsEditMode]);
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-2xl font-display font-bold text-foreground">Dashboard Overview</h2>
-          <p className="text-muted-foreground">2025 Year-to-Date Ministry Tracking</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h2 className="text-2xl font-display font-bold text-foreground">Edit Portal</h2>
+            <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
+              Edit Mode Active
+            </span>
+          </div>
+          <p className="text-muted-foreground">
+            Click on any number to edit it. Changes are applied instantly.
+          </p>
         </div>
 
         {/* Metric Key */}
@@ -51,18 +67,24 @@ const Index = () => {
 
         {/* Milestones */}
         <section className="mb-8">
-          <h2 className="text-xl font-display font-semibold text-foreground mb-4">
-            Key Milestones
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-display font-semibold text-foreground">Key Milestones</h2>
+            <AddMilestoneDialog />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {milestones.map((milestone, index) => (
               <MilestoneCard key={index} milestone={milestone} index={index} delay={600 + index * 100} />
             ))}
           </div>
         </section>
+
+        {/* Year Comparison */}
+        <section className="mb-8">
+          <YearComparisonChart />
+        </section>
       </div>
     </div>
   );
 };
 
-export default Index;
+export default EditPortal;
