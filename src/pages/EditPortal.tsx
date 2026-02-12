@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Users, Heart, BookOpen, School, Briefcase, UserCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Users, Heart, BookOpen, School, Briefcase, UserCheck, Lock } from 'lucide-react';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { MetricKey } from '@/components/dashboard/MetricKey';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -8,16 +8,65 @@ import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
 import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
 import { AddYearDialog } from '@/components/dashboard/AddYearDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+
+const EDIT_PASSWORD = 'admin123';
 
 const EditPortal = () => {
   const { term1Data, term2Data, term3Data, milestones, getGrandTotals, setIsEditMode } = useMinistryData();
   const grandTotals = getGrandTotals();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  // Always enable edit mode on this page
   useEffect(() => {
-    setIsEditMode(true);
-    return () => setIsEditMode(false);
-  }, [setIsEditMode]);
+    if (isAuthenticated) {
+      setIsEditMode(true);
+      return () => setIsEditMode(false);
+    }
+  }, [isAuthenticated, setIsEditMode]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === EDIT_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect password. Please try again.');
+      setPassword('');
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+              <Lock className="w-7 h-7 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-display">Edit Portal</CardTitle>
+            <CardDescription>Enter the password to access the editing interface.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                autoFocus
+              />
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" className="w-full">Unlock</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
