@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Heart, BookOpen, School, Briefcase, UserCheck, Lock } from 'lucide-react';
+import { Users, Heart, BookOpen, School, Briefcase, UserCheck, Lock, Trash2 } from 'lucide-react';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { MetricKey } from '@/components/dashboard/MetricKey';
 import { StatCard } from '@/components/dashboard/StatCard';
