@@ -7,6 +7,7 @@ import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
 import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
+import { AddYearDialog } from '@/components/dashboard/AddYearDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -90,13 +91,16 @@ const EditPortal = () => {
 
         {/* Year Tabs */}
         <Tabs value={selectedYear} onValueChange={setSelectedYear} className="mb-8">
-          <TabsList className="mb-4">
-            {availableYears.map(year => (
-              <TabsTrigger key={year} value={String(year)} className="px-6">
-                {year}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="flex items-center gap-3 mb-4">
+            <TabsList>
+              {availableYears.map(year => (
+                <TabsTrigger key={year} value={String(year)} className="px-6">
+                  {year}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <AddYearDialog />
+          </div>
 
           {availableYears.map(year => {
             const terms = getYearTermData(year);
