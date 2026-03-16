@@ -38,7 +38,7 @@ export const TermTable = ({ data, delay = 0, year = 2025 }: TermTableProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => resetTermData(data.term)}
+            onClick={() => resetYearTermData(year, data.term)}
             className="text-muted-foreground hover:text-destructive gap-1"
             title="Reset all values to zero"
           >
