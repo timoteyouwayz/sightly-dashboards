@@ -214,6 +214,15 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
     setYearComparisons(prev => prev.filter((_, i) => i !== index));
   };
 
+  const deleteYear = (year: number) => {
+    setYearComparisons(prev => prev.filter(y => y.year !== year));
+    setAllYearTermData(prev => {
+      const next = { ...prev };
+      delete next[year];
+      return next;
+    });
+  };
+
   return (
     <MinistryDataContext.Provider
       value={{
