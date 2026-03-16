@@ -90,13 +90,16 @@ const EditPortal = () => {
 
         {/* Year Tabs */}
         <Tabs value={selectedYear} onValueChange={setSelectedYear} className="mb-8">
-          <TabsList className="mb-4">
-            {availableYears.map(year => (
-              <TabsTrigger key={year} value={String(year)} className="px-6">
-                {year}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="flex items-center gap-3 mb-4">
+            <TabsList>
+              {availableYears.map(year => (
+                <TabsTrigger key={year} value={String(year)} className="px-6">
+                  {year}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <AddYearDialog />
+          </div>
 
           {availableYears.map(year => {
             const terms = getYearTermData(year);
