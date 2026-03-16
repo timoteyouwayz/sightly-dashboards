@@ -7,6 +7,7 @@ import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TermTable } from '@/components/dashboard/TermTable';
 import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart';
 import { AddMilestoneDialog } from '@/components/dashboard/AddMilestoneDialog';
+import { AddYearDialog } from '@/components/dashboard/AddYearDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
