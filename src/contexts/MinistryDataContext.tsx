@@ -10,7 +10,34 @@ import {
   yearComparisons as initialYearComparisons,
 } from '@/data/ministryData';
 
+export interface YearTermData {
+  term1: TermData;
+  term2: TermData;
+  term3: TermData;
+}
+
+const createEmptyTermData = (termNum: number, months: string[]): TermData => ({
+  term: termNum,
+  months: months.map(month => ({
+    month,
+    reached: 0,
+    bornAgain: 0,
+    discipled: 0,
+    schools: 0,
+    counties: 0,
+    partnersTrained: 0,
+  })),
+  totals: { reached: 0, bornAgain: 0, discipled: 0, schools: 0, counties: 0, partnersTrained: 0 },
+});
+
+const createEmptyYearTerms = (): YearTermData => ({
+  term1: createEmptyTermData(1, ['Jan', 'Feb', 'Mar', 'Apr']),
+  term2: createEmptyTermData(2, ['May', 'Jun', 'Jul', 'Aug']),
+  term3: createEmptyTermData(3, ['Sep', 'Oct', 'Nov', 'Dec']),
+});
+
 interface MinistryDataContextType {
+  // Legacy accessors for 2025 (backward compat)
   term1Data: TermData;
   term2Data: TermData;
   term3Data: TermData;
@@ -34,6 +61,20 @@ interface MinistryDataContextType {
     counties: number;
     partnersTrained: number;
   };
+  // Multi-year support
+  allYearTermData: Record<number, YearTermData>;
+  getYearTermData: (year: number) => YearTermData;
+  updateYearTermData: (year: number, term: number, monthIndex: number, field: string, value: number) => void;
+  resetYearTermData: (year: number, term: number) => void;
+  getYearTotals: (year: number) => {
+    reached: number;
+    bornAgain: number;
+    discipled: number;
+    schools: number;
+    counties: number;
+    partnersTrained: number;
+  };
+  getAvailableYears: () => number[];
 }
 
 const MinistryDataContext = createContext<MinistryDataContextType | undefined>(undefined);
@@ -53,47 +94,86 @@ const recalculateTotals = (months: TermData['months']): TermData['totals'] => {
 };
 
 export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
-  const [term1Data, setTerm1Data] = useState<TermData>(initialTerm1);
-  const [term2Data, setTerm2Data] = useState<TermData>(initialTerm2);
-  const [term3Data, setTerm3Data] = useState<TermData>(initialTerm3);
+  const [allYearTermData, setAllYearTermData] = useState<Record<number, YearTermData>>({
+    2025: { term1: initialTerm1, term2: initialTerm2, term3: initialTerm3 },
+  });
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones);
   const [yearComparisons, setYearComparisons] = useState<YearComparison[]>(initialYearComparisons);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const updateTermData = (term: number, monthIndex: number, field: string, value: number) => {
-    const updateTerm = (prev: TermData): TermData => {
-      const newMonths = [...prev.months];
+  // Backward compat: 2025 term data
+  const term1Data = allYearTermData[2025]?.term1 ?? createEmptyTermData(1, ['Jan', 'Feb', 'Mar', 'Apr']);
+  const term2Data = allYearTermData[2025]?.term2 ?? createEmptyTermData(2, ['May', 'Jun', 'Jul', 'Aug']);
+  const term3Data = allYearTermData[2025]?.term3 ?? createEmptyTermData(3, ['Sep', 'Oct', 'Nov', 'Dec']);
+
+  const getYearTermData = (year: number): YearTermData => {
+    return allYearTermData[year] ?? createEmptyYearTerms();
+  };
+
+  const updateYearTermData = (year: number, term: number, monthIndex: number, field: string, value: number) => {
+    setAllYearTermData(prev => {
+      const yearData = prev[year] ?? createEmptyYearTerms();
+      const termKey = `term${term}` as keyof YearTermData;
+      const termData = yearData[termKey];
+      const newMonths = [...termData.months];
       newMonths[monthIndex] = { ...newMonths[monthIndex], [field]: value };
       return {
         ...prev,
-        months: newMonths,
-        totals: recalculateTotals(newMonths),
+        [year]: {
+          ...yearData,
+          [termKey]: {
+            ...termData,
+            months: newMonths,
+            totals: recalculateTotals(newMonths),
+          },
+        },
       };
-    };
+    });
+  };
 
-    if (term === 1) setTerm1Data(updateTerm);
-    else if (term === 2) setTerm2Data(updateTerm);
-    else if (term === 3) setTerm3Data(updateTerm);
+  const resetYearTermData = (year: number, term: number) => {
+    const monthNames = term === 1 ? ['Jan', 'Feb', 'Mar', 'Apr'] : term === 2 ? ['May', 'Jun', 'Jul', 'Aug'] : ['Sep', 'Oct', 'Nov', 'Dec'];
+    setAllYearTermData(prev => {
+      const yearData = prev[year] ?? createEmptyYearTerms();
+      const termKey = `term${term}` as keyof YearTermData;
+      return {
+        ...prev,
+        [year]: {
+          ...yearData,
+          [termKey]: createEmptyTermData(term, monthNames),
+        },
+      };
+    });
+  };
+
+  // Legacy updateTermData for 2025
+  const updateTermData = (term: number, monthIndex: number, field: string, value: number) => {
+    updateYearTermData(2025, term, monthIndex, field, value);
   };
 
   const resetTermData = (term: number) => {
-    const createEmptyTerm = (termNum: number, months: string[]): TermData => ({
-      term: termNum,
-      months: months.map(month => ({
-        month,
-        reached: 0,
-        bornAgain: 0,
-        discipled: 0,
-        schools: 0,
-        counties: 0,
-        partnersTrained: 0,
-      })),
-      totals: { reached: 0, bornAgain: 0, discipled: 0, schools: 0, counties: 0, partnersTrained: 0 },
-    });
+    resetYearTermData(2025, term);
+  };
 
-    if (term === 1) setTerm1Data(createEmptyTerm(1, ['Jan', 'Feb', 'Mar', 'Apr']));
-    else if (term === 2) setTerm2Data(createEmptyTerm(2, ['May', 'Jun', 'Jul', 'Aug']));
-    else if (term === 3) setTerm3Data(createEmptyTerm(3, ['Sep', 'Oct', 'Nov', 'Dec']));
+  const getYearTotals = (year: number) => {
+    const data = getYearTermData(year);
+    return {
+      reached: data.term1.totals.reached + data.term2.totals.reached + data.term3.totals.reached,
+      bornAgain: data.term1.totals.bornAgain + data.term2.totals.bornAgain + data.term3.totals.bornAgain,
+      discipled: data.term1.totals.discipled + data.term2.totals.discipled + data.term3.totals.discipled,
+      schools: data.term1.totals.schools + data.term2.totals.schools + data.term3.totals.schools,
+      counties: data.term1.totals.counties + data.term2.totals.counties + data.term3.totals.counties,
+      partnersTrained: data.term1.totals.partnersTrained + data.term2.totals.partnersTrained + data.term3.totals.partnersTrained,
+    };
+  };
+
+  const getGrandTotals = () => getYearTotals(2025);
+
+  const getAvailableYears = () => {
+    const years = new Set<number>();
+    yearComparisons.forEach(y => years.add(y.year));
+    Object.keys(allYearTermData).forEach(y => years.add(Number(y)));
+    return Array.from(years).sort((a, b) => a - b);
   };
 
   const updateMilestone = (index: number, field: 'current' | 'target', value: number) => {
@@ -114,6 +194,11 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
 
   const addYearComparison = (year: YearComparison) => {
     setYearComparisons(prev => [...prev, year].sort((a, b) => a.year - b.year));
+    // Also create empty term data for the new year if it doesn't exist
+    setAllYearTermData(prev => {
+      if (prev[year.year]) return prev;
+      return { ...prev, [year.year]: createEmptyYearTerms() };
+    });
   };
 
   const updateYearComparison = (index: number, field: string, value: number) => {
@@ -127,15 +212,6 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
   const deleteYearComparison = (index: number) => {
     setYearComparisons(prev => prev.filter((_, i) => i !== index));
   };
-
-  const getGrandTotals = () => ({
-    reached: term1Data.totals.reached + term2Data.totals.reached + term3Data.totals.reached,
-    bornAgain: term1Data.totals.bornAgain + term2Data.totals.bornAgain + term3Data.totals.bornAgain,
-    discipled: term1Data.totals.discipled + term2Data.totals.discipled + term3Data.totals.discipled,
-    schools: term1Data.totals.schools + term2Data.totals.schools + term3Data.totals.schools,
-    counties: term1Data.totals.counties + term2Data.totals.counties + term3Data.totals.counties,
-    partnersTrained: term1Data.totals.partnersTrained + term2Data.totals.partnersTrained + term3Data.totals.partnersTrained,
-  });
 
   return (
     <MinistryDataContext.Provider
@@ -156,6 +232,12 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
         deleteYearComparison,
         resetTermData,
         getGrandTotals,
+        allYearTermData,
+        getYearTermData,
+        updateYearTermData,
+        resetYearTermData,
+        getYearTotals,
+        getAvailableYears,
       }}
     >
       {children}
