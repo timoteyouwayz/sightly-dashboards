@@ -2,26 +2,29 @@ import { useParams, Navigate } from 'react-router-dom';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { Users, Heart, BookOpen, School, MapPin, UserCheck } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+import { TermTable } from '@/components/dashboard/TermTable';
+import { MetricKey } from '@/components/dashboard/MetricKey';
+import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 
 const YearPage = () => {
   const { year } = useParams<{ year: string }>();
-  const { yearComparisons, term1Data, term2Data, term3Data, getGrandTotals } = useMinistryData();
+  const { yearComparisons, milestones, getYearTermData, getYearTotals, allYearTermData, getAvailableYears } = useMinistryData();
   const yearNum = Number(year);
 
-  // For 2025, show current term data; for others, show from yearComparisons
-  const yearData = yearComparisons.find((y) => y.year === yearNum);
-  const is2025 = yearNum === 2025;
+  const availableYears = getAvailableYears();
+  const yearExists = availableYears.includes(yearNum) || yearComparisons.some(y => y.year === yearNum);
 
-  if (!yearData && !is2025) {
+  if (!yearExists) {
     return <Navigate to="/" replace />;
   }
 
-  const stats = is2025
-    ? getGrandTotals()
-    : yearData!;
+  const hasTermData = !!allYearTermData[yearNum];
+  const yearTerms = getYearTermData(yearNum);
+  const totals = getYearTotals(yearNum);
+
+  // If no term data, fall back to yearComparisons summary
+  const yearCompData = yearComparisons.find(y => y.year === yearNum);
+  const stats = hasTermData ? totals : (yearCompData ?? totals);
 
   const metrics = [
     { title: 'Reached', value: stats.reached, icon: Users, variant: 'primary' as const },
@@ -38,8 +41,13 @@ const YearPage = () => {
         <div className="mb-6">
           <h2 className="text-2xl font-display font-bold text-foreground">{yearNum} Ministry Report</h2>
           <p className="text-muted-foreground">
-            {is2025 ? 'Current year data with term breakdown' : `Annual summary for ${yearNum}`}
+            {hasTermData ? 'Full year data with term breakdown' : 'Annual summary'}
           </p>
+        </div>
+
+        {/* Metric Key */}
+        <div className="mb-8 animate-fade-in">
+          <MetricKey />
         </div>
 
         {/* Stats Grid */}
@@ -51,72 +59,26 @@ const YearPage = () => {
           </div>
         </section>
 
-        {/* Term breakdown for 2025 */}
-        {is2025 && (
+        {/* Term breakdown if term data exists */}
+        {hasTermData && (
           <section className="mb-8">
             <h3 className="text-xl font-display font-semibold text-foreground mb-4">Term Breakdown</h3>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {[term1Data, term2Data, term3Data].map((term) => (
-                <div key={term.term} className="card-elevated overflow-hidden">
-                  <div className="p-4 border-b border-border bg-muted/30">
-                    <h4 className="font-display font-semibold text-foreground">Term {term.term}</h4>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="table-header">
-                        <TableHead>Month</TableHead>
-                        <TableHead className="text-right">Reached</TableHead>
-                        <TableHead className="text-right">Born Again</TableHead>
-                        <TableHead className="text-right">Discipled</TableHead>
-                        <TableHead className="text-right">Schools</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {term.months.map((m) => (
-                        <TableRow key={m.month}>
-                          <TableCell className="font-medium text-primary">{m.month}</TableCell>
-                          <TableCell className="text-right font-mono">{m.reached.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-mono text-success">{m.bornAgain.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-mono text-info">{m.discipled.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-mono text-warning">{m.schools.toLocaleString()}</TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow className="bg-muted/50 font-semibold border-t-2 border-primary/20">
-                        <TableCell>Total</TableCell>
-                        <TableCell className="text-right font-mono">{term.totals.reached.toLocaleString()}</TableCell>
-                        <TableCell className="text-right font-mono text-success">{term.totals.bornAgain.toLocaleString()}</TableCell>
-                        <TableCell className="text-right font-mono text-info">{term.totals.discipled.toLocaleString()}</TableCell>
-                        <TableCell className="text-right font-mono text-warning">{term.totals.schools.toLocaleString()}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              ))}
+              <TermTable data={yearTerms.term1} delay={300} year={yearNum} />
+              <TermTable data={yearTerms.term2} delay={400} year={yearNum} />
+              <TermTable data={yearTerms.term3} delay={500} year={yearNum} />
             </div>
           </section>
         )}
 
-        {/* Summary table for historical years */}
-        {!is2025 && yearData && (
+        {/* Milestones for current year */}
+        {yearNum === 2025 && milestones.length > 0 && (
           <section className="mb-8">
-            <div className="card-elevated p-6">
-              <h3 className="text-xl font-display font-semibold text-foreground mb-4">Annual Summary</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow className="table-header">
-                    <TableHead>Metric</TableHead>
-                    <TableHead className="text-right">Value</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {metrics.map((m) => (
-                    <TableRow key={m.title}>
-                      <TableCell className="font-medium">{m.title}</TableCell>
-                      <TableCell className="text-right font-mono font-semibold">{m.value.toLocaleString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <h2 className="text-xl font-display font-semibold text-foreground mb-4">Key Milestones</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {milestones.map((milestone, index) => (
+                <MilestoneCard key={index} milestone={milestone} index={index} delay={600 + index * 100} />
+              ))}
             </div>
           </section>
         )}
