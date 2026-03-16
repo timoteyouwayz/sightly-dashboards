@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Heart, BookOpen, School, Briefcase, UserCheck, Lock } from 'lucide-react';
+import { Users, Heart, BookOpen, School, Briefcase, UserCheck, Lock, Trash2 } from 'lucide-react';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { MetricKey } from '@/components/dashboard/MetricKey';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const EDIT_PASSWORD = 'admin123';
 
 const EditPortal = () => {
-  const { milestones, getAvailableYears, getYearTermData, getYearTotals, setIsEditMode } = useMinistryData();
+  const { milestones, getAvailableYears, getYearTermData, getYearTotals, setIsEditMode, deleteYear } = useMinistryData();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -100,6 +100,24 @@ const EditPortal = () => {
               ))}
             </TabsList>
             <AddYearDialog />
+            {availableYears.length > 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const yearNum = Number(selectedYear);
+                  if (confirm(`Delete all data for ${selectedYear}? This cannot be undone.`)) {
+                    deleteYear(yearNum);
+                    const remaining = availableYears.filter(y => y !== yearNum);
+                    setSelectedYear(String(remaining[remaining.length - 1]));
+                  }
+                }}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete {selectedYear}
+              </Button>
+            )}
           </div>
 
           {availableYears.map(year => {
