@@ -248,6 +248,7 @@ export const MinistryDataProvider = ({ children }: { children: ReactNode }) => {
         resetYearTermData,
         getYearTotals,
         getAvailableYears,
+        deleteYear,
       }}
     >
       {children}
