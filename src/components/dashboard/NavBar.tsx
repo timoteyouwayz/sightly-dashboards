@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Edit3, Calendar, GitCompare } from 'lucide-react';
+import { BarChart3, Edit3, GitCompare, Calendar } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -11,6 +12,8 @@ const navItems = [
 
 export const NavBar = () => {
   const location = useLocation();
+  const { getAvailableYears } = useMinistryData();
+  const years = getAvailableYears();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
@@ -48,8 +51,8 @@ export const NavBar = () => {
               );
             })}
 
-            {/* Year links */}
-            {[2023, 2024, 2025].map((year) => (
+            {/* Dynamic year links */}
+            {years.map((year) => (
               <Link
                 key={year}
                 to={`/year/${year}`}
