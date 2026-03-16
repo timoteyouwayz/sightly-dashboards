@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const EDIT_PASSWORD = 'admin123';
 
 const EditPortal = () => {
-  const { milestones, getAvailableYears, getYearTermData, getYearTotals, setIsEditMode } = useMinistryData();
+  const { milestones, getAvailableYears, getYearTermData, getYearTotals, setIsEditMode, deleteYear } = useMinistryData();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
