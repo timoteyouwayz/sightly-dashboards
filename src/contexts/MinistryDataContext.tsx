@@ -75,6 +75,7 @@ interface MinistryDataContextType {
     partnersTrained: number;
   };
   getAvailableYears: () => number[];
+  deleteYear: (year: number) => void;
 }
 
 const MinistryDataContext = createContext<MinistryDataContextType | undefined>(undefined);
