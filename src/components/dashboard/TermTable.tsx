@@ -15,13 +15,14 @@ import {
 interface TermTableProps {
   data: TermData;
   delay?: number;
+  year?: number;
 }
 
-export const TermTable = ({ data, delay = 0 }: TermTableProps) => {
-  const { updateTermData, resetTermData, isEditMode } = useMinistryData();
+export const TermTable = ({ data, delay = 0, year = 2025 }: TermTableProps) => {
+  const { updateYearTermData, resetYearTermData, isEditMode } = useMinistryData();
 
   const handleUpdate = (monthIndex: number, field: string, value: number) => {
-    updateTermData(data.term, monthIndex, field, value);
+    updateYearTermData(year, data.term, monthIndex, field, value);
   };
 
   return (
