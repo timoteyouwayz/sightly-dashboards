@@ -13,7 +13,7 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-2xl font-display font-bold text-foreground">Dashboard Overview</h2>
+          <h2 className="text-2xl font-display font-bold text-foreground">Dashboard </h2>
           <p className="text-muted-foreground">2025 Year-to-Date Ministry Tracking</p>
         </div>
 
@@ -55,14 +55,14 @@ const Index = () => {
             Key Milestones
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {milestones.map((milestone, index) => (
-              <MilestoneCard key={index} milestone={milestone} index={index} delay={600 + index * 100} />
-            ))}
+            {milestones.map((milestone, index) =>
+            <MilestoneCard key={index} milestone={milestone} index={index} delay={600 + index * 100} />
+            )}
           </div>
         </section>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Index;
