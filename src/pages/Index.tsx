@@ -17,8 +17,11 @@ const fadeUp = {
 };
 
 const Index = () => {
-  const { term1Data, term2Data, term3Data, milestones, getGrandTotals } = useMinistryData();
-  const grandTotals = getGrandTotals();
+  const { milestones, getAvailableYears, getYearTermData, getYearTotals } = useMinistryData();
+  const years = getAvailableYears();
+  const latestYear = years.length > 0 ? years[years.length - 1] : 2025;
+  const yearTerms = getYearTermData(latestYear);
+  const grandTotals = getYearTotals(latestYear);
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -26,7 +29,7 @@ const Index = () => {
         <motion.div initial="hidden" animate="show" variants={stagger}>
           <motion.div variants={fadeUp} className="mb-6">
             <h2 className="text-2xl font-display font-bold text-foreground">Dashboard</h2>
-            <p className="text-muted-foreground">2025 Year-to-Date Ministry Tracking</p>
+            <p className="text-muted-foreground">{latestYear} Year-to-Date Ministry Tracking</p>
           </motion.div>
 
           <motion.div variants={fadeUp} className="mb-8">
@@ -36,7 +39,7 @@ const Index = () => {
           {/* Grand Totals */}
           <motion.section variants={fadeUp} className="mb-8">
             <h2 className="text-xl font-display font-semibold text-foreground mb-4">
-              2025 Year-to-Date Totals
+              {latestYear} Year-to-Date Totals
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
               <StatCard title="Reached" value={grandTotals.reached} icon={Users} variant="primary" delay={0} />
@@ -52,9 +55,9 @@ const Index = () => {
           <motion.section variants={fadeUp} className="mb-8">
             <h2 className="text-xl font-display font-semibold text-foreground mb-4">Term Breakdown</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-              <TermTable data={term1Data} delay={300} />
-              <TermTable data={term2Data} delay={400} />
-              <TermTable data={term3Data} delay={500} />
+              <TermTable data={yearTerms.term1} delay={300} year={latestYear} />
+              <TermTable data={yearTerms.term2} delay={400} year={latestYear} />
+              <TermTable data={yearTerms.term3} delay={500} year={latestYear} />
             </div>
           </motion.section>
 
