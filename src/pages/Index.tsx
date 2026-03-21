@@ -39,7 +39,7 @@ const Index = () => {
           {/* Grand Totals */}
           <motion.section variants={fadeUp} className="mb-8">
             <h2 className="text-xl font-display font-semibold text-foreground mb-4">
-              2025 Year-to-Date Totals
+              {latestYear} Year-to-Date Totals
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
               <StatCard title="Reached" value={grandTotals.reached} icon={Users} variant="primary" delay={0} />
