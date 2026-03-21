@@ -20,6 +20,13 @@ export const AnimatedBackground = () => {
     let animationId: number;
     const shapes: Shape[] = [];
     const PERSPECTIVE = 800;
+    const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouse.targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    window.addEventListener('mousemove', onMouseMove);
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -50,9 +57,7 @@ export const AnimatedBackground = () => {
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const angle = (Math.PI / 3) * i - Math.PI / 6;
-        const px = size * Math.cos(angle);
-        const py = size * Math.sin(angle);
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        ctx[i === 0 ? 'moveTo' : 'lineTo'](size * Math.cos(angle), size * Math.sin(angle));
       }
       ctx.closePath();
     };
@@ -61,9 +66,7 @@ export const AnimatedBackground = () => {
       ctx.beginPath();
       for (let i = 0; i < 3; i++) {
         const angle = (Math.PI * 2 / 3) * i - Math.PI / 2;
-        const px = size * Math.cos(angle);
-        const py = size * Math.sin(angle);
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        ctx[i === 0 ? 'moveTo' : 'lineTo'](size * Math.cos(angle), size * Math.sin(angle));
       }
       ctx.closePath();
     };
@@ -81,28 +84,26 @@ export const AnimatedBackground = () => {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      time += 0.01;
+      time += 0.008;
+
+      // Smooth mouse lerp
+      mouse.x += (mouse.targetX - mouse.x) * 0.05;
+      mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
       const isDark = document.documentElement.classList.contains('dark');
-      const hue1 = isDark ? '168, 65%, 50%' : '168, 65%, 40%';
-      const hue2 = isDark ? '200, 60%, 50%' : '200, 60%, 40%';
-      const hue3 = isDark ? '28, 80%, 55%' : '28, 80%, 50%';
 
-      // Sort by z for depth ordering (far first)
+      // Sort by z for depth ordering
       const sorted = [...shapes].sort((a, b) => b.z - a.z);
 
-      sorted.forEach(shape => {
+      sorted.forEach((shape, i) => {
         shape.x += shape.speedX;
         shape.y += shape.speedY;
         shape.z += shape.speedZ;
         shape.rotation += shape.rotationSpeed;
         shape.pulsePhase += 0.02;
 
-        // Wrap z
-        if (shape.z < 50) { shape.z = 700; shape.opacity = 0; }
-        if (shape.z > 700) { shape.z = 50; shape.opacity = 0; }
-
-        // Wrap x/y
+        if (shape.z < 50) { shape.z = 700; }
+        if (shape.z > 700) { shape.z = 50; }
         const halfW = canvas.width;
         const halfH = canvas.height;
         if (shape.x < -halfW) shape.x = halfW;
@@ -110,20 +111,31 @@ export const AnimatedBackground = () => {
         if (shape.y < -halfH) shape.y = halfH;
         if (shape.y > halfH) shape.y = -halfH;
 
-        // Perspective projection
         const scale = PERSPECTIVE / (PERSPECTIVE + shape.z);
-        const screenX = canvas.width / 2 + shape.x * scale;
-        const screenY = canvas.height / 2 + shape.y * scale;
+
+        // Parallax: closer shapes move more with mouse
+        const parallaxStrength = scale * 40;
+        const screenX = canvas.width / 2 + shape.x * scale + mouse.x * parallaxStrength;
+        const screenY = canvas.height / 2 + shape.y * scale + mouse.y * parallaxStrength;
         const screenSize = shape.size * scale;
 
-        // Depth-based opacity with pulse
         const depthOpacity = shape.opacity * scale * 1.5;
         const pulse = 1 + Math.sin(shape.pulsePhase) * 0.2;
         const finalOpacity = Math.min(depthOpacity * pulse, 0.35);
 
-        // Pick color based on type
-        const color = shape.type === 'diamond' || shape.type === 'ring' ? hue3
-          : shape.type === 'hexagon' ? hue2 : hue1;
+        // Gradient color shift over time — each shape gets a unique phase offset
+        const hueShift = (time * 30 + i * 17) % 360;
+        const baseHue = 140 + Math.sin(hueShift * Math.PI / 180) * 60; // shifts between teal(140)–blue(200)–back
+        const sat = isDark ? '60%' : '55%';
+        const lum = isDark ? '50%' : '40%';
+
+        // Accent shapes get warmer hues
+        let h = baseHue;
+        if (shape.type === 'diamond' || shape.type === 'ring') {
+          h = 20 + Math.sin((hueShift + 90) * Math.PI / 180) * 30; // warm orange shift
+        }
+
+        const color = `${Math.round(h)}, ${sat}, ${lum}`;
 
         ctx.save();
         ctx.translate(screenX, screenY);
@@ -164,6 +176,7 @@ export const AnimatedBackground = () => {
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', onMouseMove);
     };
   }, []);
 
