@@ -183,7 +183,7 @@ const EditPortal = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
                   <Input
                     type="email"
-                    placeholder="admin@yfckenya.org"
+                    placeholder=""
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setError(''); }}
                     autoFocus
