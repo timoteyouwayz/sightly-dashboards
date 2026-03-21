@@ -112,7 +112,7 @@ export const AnimatedBackground = () => {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.7 }}
+      style={{ opacity: 0.9 }}
     />
   );
 };
