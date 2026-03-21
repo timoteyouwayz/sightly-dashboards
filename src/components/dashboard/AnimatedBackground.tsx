@@ -24,17 +24,17 @@ export const AnimatedBackground = () => {
     window.addEventListener('resize', resize);
 
     // Create shapes
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 40; i++) {
       shapes.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 40 + 15,
-        speedX: (Math.random() - 0.5) * 0.4,
-        speedY: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 55 + 8,
+        speedX: (Math.random() - 0.5) * 0.7,
+        speedY: (Math.random() - 0.5) * 0.7,
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.005,
+        rotationSpeed: (Math.random() - 0.5) * 0.012,
         type: (['circle', 'triangle', 'hexagon'] as const)[Math.floor(Math.random() * 3)],
-        opacity: Math.random() * 0.06 + 0.02,
+        opacity: Math.random() * 0.15 + 0.05,
       });
     }
 
