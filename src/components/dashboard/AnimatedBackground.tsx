@@ -95,6 +95,38 @@ export const AnimatedBackground = () => {
       // Sort by z for depth ordering
       const sorted = [...shapes].sort((a, b) => b.z - a.z);
 
+      // Precompute screen positions
+      const screenPositions = sorted.map((shape) => {
+        const scale = PERSPECTIVE / (PERSPECTIVE + shape.z);
+        const parallaxStrength = scale * 40;
+        return {
+          x: canvas.width / 2 + shape.x * scale + mouse.x * parallaxStrength,
+          y: canvas.height / 2 + shape.y * scale + mouse.y * parallaxStrength,
+          scale,
+        };
+      });
+
+      // Draw connecting lines between nearby shapes
+      const CONNECTION_DIST = 180;
+      for (let i = 0; i < sorted.length; i++) {
+        for (let j = i + 1; j < sorted.length; j++) {
+          const dx = screenPositions[i].x - screenPositions[j].x;
+          const dy = screenPositions[i].y - screenPositions[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DIST) {
+            const opacity = (1 - dist / CONNECTION_DIST) * 0.15 * Math.min(screenPositions[i].scale, screenPositions[j].scale);
+            const isDark = document.documentElement.classList.contains('dark');
+            const lineColor = isDark ? `rgba(120, 200, 220, ${opacity})` : `rgba(40, 100, 120, ${opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(screenPositions[i].x, screenPositions[i].y);
+            ctx.lineTo(screenPositions[j].x, screenPositions[j].y);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
       sorted.forEach((shape, i) => {
         shape.x += shape.speedX;
         shape.y += shape.speedY;
@@ -111,28 +143,22 @@ export const AnimatedBackground = () => {
         if (shape.y < -halfH) shape.y = halfH;
         if (shape.y > halfH) shape.y = -halfH;
 
-        const scale = PERSPECTIVE / (PERSPECTIVE + shape.z);
-
-        // Parallax: closer shapes move more with mouse
-        const parallaxStrength = scale * 40;
-        const screenX = canvas.width / 2 + shape.x * scale + mouse.x * parallaxStrength;
-        const screenY = canvas.height / 2 + shape.y * scale + mouse.y * parallaxStrength;
+        const { x: screenX, y: screenY, scale } = screenPositions[i];
         const screenSize = shape.size * scale;
 
+        const isDark = document.documentElement.classList.contains('dark');
         const depthOpacity = shape.opacity * scale * 1.5;
         const pulse = 1 + Math.sin(shape.pulsePhase) * 0.2;
         const finalOpacity = Math.min(depthOpacity * pulse, 0.35);
 
-        // Gradient color shift over time — each shape gets a unique phase offset
         const hueShift = (time * 30 + i * 17) % 360;
-        const baseHue = 140 + Math.sin(hueShift * Math.PI / 180) * 60; // shifts between teal(140)–blue(200)–back
+        const baseHue = 140 + Math.sin(hueShift * Math.PI / 180) * 60;
         const sat = isDark ? '60%' : '55%';
         const lum = isDark ? '50%' : '40%';
 
-        // Accent shapes get warmer hues
         let h = baseHue;
         if (shape.type === 'diamond' || shape.type === 'ring') {
-          h = 20 + Math.sin((hueShift + 90) * Math.PI / 180) * 30; // warm orange shift
+          h = 20 + Math.sin((hueShift + 90) * Math.PI / 180) * 30;
         }
 
         const color = `${Math.round(h)}, ${sat}, ${lum}`;
