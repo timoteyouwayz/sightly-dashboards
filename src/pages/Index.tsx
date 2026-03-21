@@ -55,9 +55,9 @@ const Index = () => {
           <motion.section variants={fadeUp} className="mb-8">
             <h2 className="text-xl font-display font-semibold text-foreground mb-4">Term Breakdown</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-              <TermTable data={term1Data} delay={300} />
-              <TermTable data={term2Data} delay={400} />
-              <TermTable data={term3Data} delay={500} />
+              <TermTable data={yearTerms.term1} delay={300} year={latestYear} />
+              <TermTable data={yearTerms.term2} delay={400} year={latestYear} />
+              <TermTable data={yearTerms.term3} delay={500} year={latestYear} />
             </div>
           </motion.section>
 
