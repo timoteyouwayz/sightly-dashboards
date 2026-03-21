@@ -17,8 +17,11 @@ const fadeUp = {
 };
 
 const Index = () => {
-  const { term1Data, term2Data, term3Data, milestones, getGrandTotals } = useMinistryData();
-  const grandTotals = getGrandTotals();
+  const { milestones, getAvailableYears, getYearTermData, getYearTotals } = useMinistryData();
+  const years = getAvailableYears();
+  const latestYear = years.length > 0 ? years[years.length - 1] : 2025;
+  const yearTerms = getYearTermData(latestYear);
+  const grandTotals = getYearTotals(latestYear);
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -26,7 +29,7 @@ const Index = () => {
         <motion.div initial="hidden" animate="show" variants={stagger}>
           <motion.div variants={fadeUp} className="mb-6">
             <h2 className="text-2xl font-display font-bold text-foreground">Dashboard</h2>
-            <p className="text-muted-foreground">2025 Year-to-Date Ministry Tracking</p>
+            <p className="text-muted-foreground">{latestYear} Year-to-Date Ministry Tracking</p>
           </motion.div>
 
           <motion.div variants={fadeUp} className="mb-8">
