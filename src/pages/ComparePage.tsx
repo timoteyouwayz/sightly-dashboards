@@ -3,9 +3,13 @@ import { YearComparisonChart } from '@/components/dashboard/YearComparisonChart'
 import { MilestoneCard } from '@/components/dashboard/MilestoneCard';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCountUp } from '@/hooks/useCountUp';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
+} from 'recharts';
 
 const metricKeys = ['reached', 'bornAgain', 'discipled', 'schools', 'counties', 'partnersTrained'] as const;
 const metricLabels: Record<string, string> = {
@@ -17,8 +21,33 @@ const metricLabels: Record<string, string> = {
   partnersTrained: 'Partners Trained',
 };
 
+const PIE_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--success))',
+  'hsl(var(--info))',
+  'hsl(var(--warning))',
+  'hsl(var(--accent))',
+  'hsl(var(--destructive))',
+];
+
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
+const GrowthCard = ({ label, growth, value }: { label: string; growth: number; value: number }) => {
+  const animatedValue = useCountUp(value, 1000);
+  return (
+    <div className="card-elevated p-4 text-center">
+      <p className="text-sm text-muted-foreground mb-1">{label}</p>
+      <p className="text-2xl font-bold font-display text-foreground">{animatedValue.toLocaleString()}</p>
+      <span className={`inline-flex items-center gap-1 text-sm font-semibold mt-1 ${
+        growth > 0 ? 'text-success' : growth < 0 ? 'text-destructive' : 'text-muted-foreground'
+      }`}>
+        {growth > 0 ? <TrendingUp className="w-3 h-3" /> : growth < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+        {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
+      </span>
+    </div>
+  );
+};
 
 const ComparePage = () => {
   const { yearComparisons, milestones } = useMinistryData();
@@ -28,6 +57,15 @@ const ComparePage = () => {
     return ((current - previous) / previous) * 100;
   };
 
+  const latest = yearComparisons.length >= 1 ? yearComparisons[yearComparisons.length - 1] : null;
+  const prev = yearComparisons.length >= 2 ? yearComparisons[yearComparisons.length - 2] : null;
+
+  // Pie chart data for latest year
+  const pieData = latest ? metricKeys.map(key => ({
+    name: metricLabels[key],
+    value: latest[key],
+  })) : [];
+
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -36,6 +74,65 @@ const ComparePage = () => {
             <h2 className="text-2xl font-display font-bold text-foreground">Year-over-Year Comparison</h2>
             <p className="text-muted-foreground">Compare ministry metrics across all years</p>
           </motion.div>
+
+          {/* Latest Growth Highlights */}
+          {latest && prev && (
+            <motion.section variants={fadeUp} className="mb-8">
+              <h3 className="text-xl font-display font-semibold text-foreground mb-4">
+                {latest.year} Growth vs {prev.year}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+                {metricKeys.map(key => (
+                  <GrowthCard
+                    key={key}
+                    label={metricLabels[key]}
+                    value={latest[key]}
+                    growth={getGrowth(latest[key], prev[key])}
+                  />
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Pie Chart for latest year */}
+          {latest && (
+            <motion.section variants={fadeUp} className="mb-8">
+              <div className="card-elevated p-6">
+                <h3 className="font-display font-semibold text-lg text-foreground mb-4">
+                  {latest.year} Ministry Distribution
+                </h3>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        innerRadius={50}
+                        dataKey="value"
+                        paddingAngle={3}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {pieData.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                        formatter={(value: number) => value.toLocaleString()}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </motion.section>
+          )}
 
           <motion.section variants={fadeUp} className="mb-8">
             <YearComparisonChart />
@@ -57,9 +154,9 @@ const ComparePage = () => {
                   </TableHeader>
                   <TableBody>
                     {metricKeys.map((key) => {
-                      const latest = yearComparisons[yearComparisons.length - 1][key];
-                      const prev = yearComparisons[yearComparisons.length - 2][key];
-                      const growth = getGrowth(latest, prev);
+                      const latestVal = yearComparisons[yearComparisons.length - 1][key];
+                      const prevVal = yearComparisons[yearComparisons.length - 2][key];
+                      const growth = getGrowth(latestVal, prevVal);
 
                       return (
                         <TableRow key={key}>
@@ -86,7 +183,6 @@ const ComparePage = () => {
             </motion.section>
           )}
 
-          {/* Milestones */}
           {milestones.length > 0 && (
             <motion.section variants={fadeUp} className="mb-8">
               <h2 className="text-xl font-display font-semibold text-foreground mb-4">Key Milestones</h2>

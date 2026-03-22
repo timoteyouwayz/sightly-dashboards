@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { EditableCell } from './EditableCell';
+import { useCountUp } from '@/hooks/useCountUp';
 
 interface StatCardProps {
   title: string;
@@ -12,16 +12,9 @@ interface StatCardProps {
   field?: string;
 }
 
-const variantStyles = {
-  primary: 'bg-primary/10 text-primary',
-  success: 'bg-success/10 text-success',
-  info: 'bg-info/10 text-info',
-  warning: 'bg-warning/10 text-warning',
-  accent: 'bg-accent/10 text-accent'
-};
-
 export const StatCard = ({ title, value, icon: Icon, variant = 'primary', delay = 0, field }: StatCardProps) => {
   const { isEditMode } = useMinistryData();
+  const animatedValue = useCountUp(value, 1200);
 
   return (
     <div
@@ -37,18 +30,12 @@ export const StatCard = ({ title, value, icon: Icon, variant = 'primary', delay 
               value={value}
               onSave={() => {}}
               className="text-3xl font-bold" />
-            
             </div> :
-
-          <p className="text-3xl font-bold font-display text-foreground animate-count-up text-center">
-              {value.toLocaleString()}
+          <p className="text-3xl font-bold font-display text-foreground text-center">
+              {animatedValue.toLocaleString()}
             </p>
           }
         </div>
-        
-
-        
       </div>
     </div>);
-
 };
