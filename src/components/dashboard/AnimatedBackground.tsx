@@ -191,6 +191,23 @@ export const AnimatedBackground = () => {
           ctx.stroke();
         }
 
+        // Glowing center dot
+        const glowRadius = Math.max(2, 4 * scale);
+        const glowGradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, glowRadius * 3);
+        glowGradient.addColorStop(0, `hsla(${color}, ${Math.min(finalOpacity * 2.5, 0.6)})`);
+        glowGradient.addColorStop(0.4, `hsla(${color}, ${Math.min(finalOpacity * 1.2, 0.3)})`);
+        glowGradient.addColorStop(1, `hsla(${color}, 0)`);
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, glowRadius * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Solid center dot
+        ctx.fillStyle = `hsla(${color}, ${Math.min(finalOpacity * 3, 0.8)})`;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, glowRadius * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
       });
 
