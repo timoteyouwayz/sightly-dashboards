@@ -166,29 +166,51 @@ export const AnimatedBackground = () => {
         ctx.save();
         ctx.translate(screenX, screenY);
         ctx.rotate(shape.rotation);
-        ctx.strokeStyle = `hsla(${color}, ${finalOpacity})`;
+
+        // Glassy fill
+        const glassFill = `hsla(${color}, ${finalOpacity * 0.35})`;
+        const glassStroke = `hsla(${color}, ${finalOpacity * 1.4})`;
+        const highlightOpacity = finalOpacity * 0.5;
+
+        ctx.fillStyle = glassFill;
+        ctx.strokeStyle = glassStroke;
         ctx.lineWidth = Math.max(0.5, 1.5 * scale);
 
+        const drawShapeAndFill = (drawFn: () => void) => {
+          drawFn();
+          ctx.fill();
+          ctx.stroke();
+          // Glass highlight — subtle lighter arc at the top
+          ctx.save();
+          ctx.clip();
+          ctx.beginPath();
+          ctx.ellipse(0, -screenSize * 0.35, screenSize * 0.7, screenSize * 0.4, 0, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(0, 0%, 100%, ${highlightOpacity})`;
+          ctx.fill();
+          ctx.restore();
+        };
+
         if (shape.type === 'circle') {
-          ctx.beginPath();
-          ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
-          ctx.stroke();
+          drawShapeAndFill(() => {
+            ctx.beginPath();
+            ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
+          });
         } else if (shape.type === 'triangle') {
-          drawTriangle(screenSize);
-          ctx.stroke();
+          drawShapeAndFill(() => drawTriangle(screenSize));
         } else if (shape.type === 'hexagon') {
-          drawHexagon(screenSize);
-          ctx.stroke();
+          drawShapeAndFill(() => drawHexagon(screenSize));
         } else if (shape.type === 'ring') {
-          ctx.beginPath();
-          ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
-          ctx.stroke();
+          drawShapeAndFill(() => {
+            ctx.beginPath();
+            ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
+          });
+          // Inner ring stroke only
           ctx.beginPath();
           ctx.arc(0, 0, screenSize * 0.6, 0, Math.PI * 2);
+          ctx.strokeStyle = glassStroke;
           ctx.stroke();
         } else {
-          drawDiamond(screenSize);
-          ctx.stroke();
+          drawShapeAndFill(() => drawDiamond(screenSize));
         }
 
         // Glowing center dot
