@@ -167,44 +167,59 @@ export const AnimatedBackground = () => {
         ctx.translate(screenX, screenY);
         ctx.rotate(shape.rotation);
 
-        // Glassy fill
-        const glassFill = `hsla(${color}, ${finalOpacity * 0.35})`;
-        const glassStroke = `hsla(${color}, ${finalOpacity * 1.4})`;
-        const highlightOpacity = finalOpacity * 0.5;
+        // CG radial gradient fill
+        const gradFill = ctx.createRadialGradient(
+          -screenSize * 0.25, -screenSize * 0.3, screenSize * 0.05,
+          0, 0, screenSize * 1.1
+        );
+        gradFill.addColorStop(0, `hsla(${color}, ${finalOpacity * 0.7})`);
+        gradFill.addColorStop(0.4, `hsla(${color}, ${finalOpacity * 0.4})`);
+        gradFill.addColorStop(0.8, `hsla(${color}, ${finalOpacity * 0.15})`);
+        gradFill.addColorStop(1, `hsla(${color}, ${finalOpacity * 0.05})`);
 
-        ctx.fillStyle = glassFill;
+        const glassStroke = `hsla(${color}, ${finalOpacity * 1.2})`;
+        const rimLight = `hsla(${Math.round(h + 30)}, 70%, 70%, ${finalOpacity * 0.8})`;
+
+        ctx.fillStyle = gradFill;
         ctx.strokeStyle = glassStroke;
         ctx.lineWidth = Math.max(0.5, 1.5 * scale);
+        ctx.shadowColor = `hsla(${color}, ${finalOpacity * 0.5})`;
+        ctx.shadowBlur = screenSize * 0.5;
 
         const drawShapeAndFill = (drawFn: () => void) => {
           drawFn();
           ctx.fill();
           ctx.stroke();
-          // Glass highlight — subtle lighter arc at the top
+          ctx.shadowBlur = 0;
+          // Specular highlight
           ctx.save();
+          drawFn();
           ctx.clip();
           ctx.beginPath();
-          ctx.ellipse(0, -screenSize * 0.35, screenSize * 0.7, screenSize * 0.4, 0, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(0, 0%, 100%, ${highlightOpacity})`;
+          ctx.ellipse(-screenSize * 0.15, -screenSize * 0.3, screenSize * 0.5, screenSize * 0.28, -0.3, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(0, 0%, 100%, ${finalOpacity * 0.55})`;
+          ctx.fill();
+          ctx.restore();
+          // Rim light
+          ctx.save();
+          drawFn();
+          ctx.clip();
+          ctx.beginPath();
+          ctx.ellipse(screenSize * 0.3, screenSize * 0.35, screenSize * 0.7, screenSize * 0.12, 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = rimLight;
           ctx.fill();
           ctx.restore();
         };
 
         if (shape.type === 'circle') {
-          drawShapeAndFill(() => {
-            ctx.beginPath();
-            ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
-          });
+          drawShapeAndFill(() => { ctx.beginPath(); ctx.arc(0, 0, screenSize, 0, Math.PI * 2); });
         } else if (shape.type === 'triangle') {
           drawShapeAndFill(() => drawTriangle(screenSize));
         } else if (shape.type === 'hexagon') {
           drawShapeAndFill(() => drawHexagon(screenSize));
         } else if (shape.type === 'ring') {
-          drawShapeAndFill(() => {
-            ctx.beginPath();
-            ctx.arc(0, 0, screenSize, 0, Math.PI * 2);
-          });
-          // Inner ring stroke only
+          drawShapeAndFill(() => { ctx.beginPath(); ctx.arc(0, 0, screenSize, 0, Math.PI * 2); });
+          ctx.shadowBlur = 0;
           ctx.beginPath();
           ctx.arc(0, 0, screenSize * 0.6, 0, Math.PI * 2);
           ctx.strokeStyle = glassStroke;
@@ -212,6 +227,7 @@ export const AnimatedBackground = () => {
         } else {
           drawShapeAndFill(() => drawDiamond(screenSize));
         }
+        ctx.shadowBlur = 0;
 
         // Glowing center dot
         const glowRadius = Math.max(2, 4 * scale);
