@@ -311,7 +311,8 @@ export default function Index() {
                 <MapPin className="h-5 w-5 text-sky-500" />
                 <div>
                   <p className="font-medium">Address</p>
-                  <p>YFC Kenya Office, Westlands, Nairobi</p>
+                  <p>Karuna Close, Off Waiyaki Way. 
+                     House no. 14</p>
                 </div>
               </div>
             </div>
