@@ -174,7 +174,7 @@ export default function Index() {
                 <p className="text-base sm:text-lg leading-relaxed text-slate-100 max-w-2xl">{heroText}</p>
                 <div className="inline-flex">
                   <span className="inline-flex items-center rounded-full bg-sky-500/20 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-sky-100 ring-1 ring-sky-400/30">
-                    Current Year totals • {latestYear}
+                    {latestYear} Latest Numbers
                   </span>
                 </div>
               </div>
