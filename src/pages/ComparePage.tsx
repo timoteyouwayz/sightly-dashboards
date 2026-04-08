@@ -7,9 +7,6 @@ import { useCountUp } from '@/hooks/useCountUp';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import {
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
-} from 'recharts';
 
 const metricKeys = ['reached', 'bornAgain', 'discipled', 'schools', 'counties', 'partnersTrained'] as const;
 const metricLabels: Record<string, string> = {
@@ -21,30 +18,28 @@ const metricLabels: Record<string, string> = {
   partnersTrained: 'Partners Trained',
 };
 
-const PIE_COLORS = [
-  'hsl(var(--primary))',
-  'hsl(var(--success))',
-  'hsl(var(--info))',
-  'hsl(var(--warning))',
-  'hsl(var(--accent))',
-  'hsl(var(--destructive))',
-];
-
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 const GrowthCard = ({ label, growth, value }: { label: string; growth: number; value: number }) => {
   const animatedValue = useCountUp(value, 1000);
+  const animatedGrowth = useCountUp(Math.abs(growth), 1500);
+
   return (
     <div className="card-elevated p-4 text-center">
       <p className="text-sm text-muted-foreground mb-1">{label}</p>
       <p className="text-2xl font-bold font-display text-foreground">{animatedValue.toLocaleString()}</p>
-      <span className={`inline-flex items-center gap-1 text-sm font-semibold mt-1 ${
-        growth > 0 ? 'text-success' : growth < 0 ? 'text-destructive' : 'text-muted-foreground'
-      }`}>
+      <motion.span
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className={`inline-flex items-center gap-1 text-sm font-semibold mt-1 ${
+          growth > 0 ? 'text-success' : growth < 0 ? 'text-destructive' : 'text-muted-foreground'
+        }`}
+      >
         {growth > 0 ? <TrendingUp className="w-3 h-3" /> : growth < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
-        {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
-      </span>
+        {growth > 0 ? '+' : ''}{animatedGrowth.toFixed(1)}%
+      </motion.span>
     </div>
   );
 };
@@ -59,12 +54,6 @@ const ComparePage = () => {
 
   const latest = yearComparisons.length >= 1 ? yearComparisons[yearComparisons.length - 1] : null;
   const prev = yearComparisons.length >= 2 ? yearComparisons[yearComparisons.length - 2] : null;
-
-  // Pie chart data for latest year
-  const pieData = latest ? metricKeys.map(key => ({
-    name: metricLabels[key],
-    value: latest[key],
-  })) : [];
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -90,46 +79,6 @@ const ComparePage = () => {
                     growth={getGrowth(latest[key], prev[key])}
                   />
                 ))}
-              </div>
-            </motion.section>
-          )}
-
-          {/* Pie Chart for latest year */}
-          {latest && (
-            <motion.section variants={fadeUp} className="mb-8">
-              <div className="card-elevated p-6">
-                <h3 className="font-display font-semibold text-lg text-foreground mb-4">
-                  {latest.year} Ministry Distribution
-                </h3>
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        innerRadius={50}
-                        dataKey="value"
-                        paddingAngle={3}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {pieData.map((_, i) => (
-                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                        }}
-                        formatter={(value: number) => value.toLocaleString()}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
               </div>
             </motion.section>
           )}
@@ -167,12 +116,17 @@ const ComparePage = () => {
                             </TableCell>
                           ))}
                           <TableCell className="text-right">
-                            <span className={`inline-flex items-center gap-1 font-semibold ${
-                              growth > 0 ? 'text-success' : growth < 0 ? 'text-destructive' : 'text-muted-foreground'
-                            }`}>
+                            <motion.span
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: 0.3, duration: 0.5 }}
+                              className={`inline-flex items-center gap-1 font-semibold ${
+                                growth > 0 ? 'text-success' : growth < 0 ? 'text-destructive' : 'text-muted-foreground'
+                              }`}
+                            >
                               {growth > 0 ? <TrendingUp className="w-4 h-4" /> : growth < 0 ? <TrendingDown className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                               {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
-                            </span>
+                            </motion.span>
                           </TableCell>
                         </TableRow>
                       );
@@ -183,16 +137,6 @@ const ComparePage = () => {
             </motion.section>
           )}
 
-          {milestones.length > 0 && (
-            <motion.section variants={fadeUp} className="mb-8">
-              <h2 className="text-xl font-display font-semibold text-foreground mb-4">Key Milestones</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {milestones.map((milestone, index) => (
-                  <MilestoneCard key={index} milestone={milestone} index={index} delay={600 + index * 100} />
-                ))}
-              </div>
-            </motion.section>
-          )}
         </motion.div>
       </div>
     </div>

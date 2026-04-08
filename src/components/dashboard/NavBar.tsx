@@ -1,42 +1,32 @@
-import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, GitCompare, Calendar, Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu, BarChart3, GitCompare } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
-import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
-const navItems = [
+const fixedLinks = [
   { to: '/', label: 'Dashboard', icon: BarChart3 },
   { to: '/compare', label: 'Compare', icon: GitCompare },
 ];
 
 export const NavBar = () => {
-  const location = useLocation();
   const { getAvailableYears } = useMinistryData();
   const years = getAvailableYears();
   const [open, setOpen] = useState(false);
 
-  const isActive = (to: string) =>
-    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
-
   const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
-      {navItems.map((item) => (
+      {fixedLinks.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           onClick={onNavigate}
-          className={cn(
-            'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors',
-            isActive(item.to)
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-          )}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           <item.icon className="w-4 h-4" />
-          <span>{item.label}</span>
+          {item.label}
         </Link>
       ))}
       {years.map((year) => (
@@ -44,15 +34,9 @@ export const NavBar = () => {
           key={year}
           to={`/year/${year}`}
           onClick={onNavigate}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-            location.pathname === `/year/${year}`
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-          )}
+          className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
         >
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{year}</span>
+          {year}
         </Link>
       ))}
     </>
@@ -62,16 +46,13 @@ export const NavBar = () => {
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between h-14 md:h-16">
-          <Link to="/" className="flex items-center gap-2 md:gap-3">
+          <a href="#hero" className="flex items-center gap-2 md:gap-3">
             <div className="p-1.5 md:p-2 rounded-xl bg-primary text-primary-foreground">
-              <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
+              Y
             </div>
-            <span className="font-display font-bold text-base md:text-lg text-foreground">
-              YFC Kenya
-            </span>
-          </Link>
+            <span className="font-display font-bold text-base md:text-lg text-foreground">YFC Kenya</span>
+          </a>
 
-          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
             <NavLinks />
             <div className="ml-2 pl-2 border-l border-border">
@@ -79,7 +60,6 @@ export const NavBar = () => {
             </div>
           </div>
 
-          {/* Mobile nav */}
           <div className="flex md:hidden items-center gap-2">
             <ThemeToggle />
             <Sheet open={open} onOpenChange={setOpen}>

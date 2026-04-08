@@ -5,7 +5,7 @@ import { AdminFloatingButton } from './AdminFloatingButton';
 
 export const Layout = () => {
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 relative">
       <AnimatedBackground />
       <NavBar />
       <div className="relative z-10">
