@@ -297,25 +297,25 @@ export default function Index() {
                 <Mail className="h-5 w-5 text-sky-500" />
                 <div>
                   <p className="font-medium">Email</p>
-                  <p>kenya@yfc.org</p>
+                  <p>headoffice@kenyayfc.org</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-sky-500" />
                 <div>
                   <p className="font-medium">Phone</p>
-                  <p>+254 712 345 678</p>
+                  <p>+254 712 345 678 </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-sky-500" />
                 <div>
                   <p className="font-medium">Address</p>
-                  <p>YFC Kenya Office, Nairobi, Kenya</p>
+                  <p>YFC Kenya Office, Westlands, Nairobi</p>
                 </div>
               </div>
             </div>
-            <a href="mailto:kenya@yfc.org" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
+            <a href="mailto:headoffice@kenyayfc.org" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
               <Mail className="h-4 w-4" />
               Email Us
             </a>
