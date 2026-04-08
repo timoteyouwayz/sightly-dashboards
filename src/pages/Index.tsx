@@ -13,6 +13,7 @@ interface ActivityItem {
   description: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   bgImage: string;
+  href?: string;
 }
 
 interface Testimonial {
@@ -24,12 +25,48 @@ interface Testimonial {
 }
 
 const defaultActivities: ActivityItem[] = [
-  { title: 'Prayer Gatherings', description: 'Weekly prayer and worship evenings for young people across counties.', icon: Users, bgImage: '/images/activity-weekend-clubs.jpg' },
-  { title: 'Bible Schools', description: 'Training leaders with practical theology and outreach skills.', icon: BookOpen, bgImage: '/images/activity-bible-schools.jpg' },
-  { title: 'Community Outreach', description: 'Feeding, counseling, and prayer for local families.', icon: Heart, bgImage: '/images/activity-community-outreach.jpg' },
-  { title: 'Youth Camps', description: 'Campfires and worship nights that transform hearts.', icon: School, bgImage: '/images/activity-youth-camps.jpg' },
-  { title: 'Mission & Evangelism', description: 'Field evangelism and discipleship in unreached areas.', icon: Briefcase, bgImage: '/images/activity-mission.jpg' },
-  { title: 'Leadership Training', description: 'Intensive training for emerging youth leaders and mentors.', icon: UserCheck, bgImage: '/images/activity-leadership.jpg' },
+  {
+    title: 'School Missions',
+    description: 'Supporting schools with discipleship, mentorship and outreach programs.',
+    icon: Users,
+    bgImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/project/school-missions/',
+  },
+  {
+    title: 'CPMK',
+    description: 'Community ministry and youth empowerment through CPMK initiatives.',
+    icon: Briefcase,
+    bgImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/project/cpmk/',
+  },
+  {
+    title: 'Kizazi Sasa Campsite',
+    description: 'Retreats, camps and training in a safe, faith-filled environment.',
+    icon: School,
+    bgImage: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/project/kizazi-sasa-campsite/',
+  },
+  {
+    title: 'Digital Skills',
+    description: 'Equipping young people with tech skills, digital literacy and creative media.',
+    icon: BookOpen,
+    bgImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/project/digital-skills/',
+  },
+  {
+    title: 'Sports Ministry',
+    description: 'Building character, teamwork and faith through sports outreach.',
+    icon: Heart,
+    bgImage: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/project/sports-ministry/',
+  },
+  {
+    title: 'Leadership Training',
+    description: 'Developing leaders through mentoring, coaching and spiritual formation.',
+    icon: UserCheck,
+    bgImage: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+    href: 'https://kenyayfc.org/',
+  },
 ];
 
 const statColors = [
@@ -153,6 +190,13 @@ export default function Index() {
           alt="Kenya Youth for Christ"
           className="absolute inset-0 h-full w-full object-cover opacity-75"
         />
+        <motion.img
+          src="/images/hero.jpg"
+          alt="Kenya Youth for Christ"
+          className="absolute inset-0 h-full w-full object-cover opacity-75"
+          animate={{ scale: [1.04, 1] }}
+          transition={{ duration: 30, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-950/60 to-slate-950/30" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-12 md:space-y-16">
@@ -242,19 +286,47 @@ export default function Index() {
                 <h3 className="mt-3 text-2xl sm:text-3xl font-display font-bold text-slate-900">What we do</h3>
               </div>
               <div className="grid gap-5 sm:grid-cols-2 auto-rows-max">
-                {activities.map((item, index) => (
-                  <motion.div
-                    key={item.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className={`group rounded-xl border-2 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${statColors[index % statColors.length]} hover:border-opacity-100`}
-                  >
-                    <p className="text-base font-bold text-slate-900 group-hover:text-slate-950 transition">{item.title}</p>
-                    <p className="mt-3 text-sm leading-relaxed text-slate-700 group-hover:text-slate-800 transition">{item.description}</p>
-                  </motion.div>
-                ))}
+                {activities.map((item, index) => {
+                  const card = (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="group relative overflow-hidden rounded-3xl border border-white/10 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                    >
+                      <div
+                        className="absolute inset-0 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${item.bgImage})` }}
+                      />
+                      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm" />
+                      <div className="relative flex h-full min-h-[220px] flex-col justify-between p-6">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.24em] text-sky-200/80">Activity</p>
+                          <h3 className="mt-4 text-2xl font-semibold text-white">{item.title}</h3>
+                          <p className="mt-3 text-sm leading-relaxed text-slate-100">{item.description}</p>
+                        </div>
+                        <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-sky-100 transition group-hover:text-white">
+                          Learn more
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+
+                  return item.href ? (
+                    <a
+                      key={item.title}
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block"
+                    >
+                      {card}
+                    </a>
+                  ) : (
+                    <div key={item.title}>{card}</div>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
