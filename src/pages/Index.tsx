@@ -29,43 +29,43 @@ const defaultActivities: ActivityItem[] = [
     title: 'School Missions',
     description: 'Supporting schools with discipleship, mentorship and outreach programs.',
     icon: Users,
-    bgImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+    bgImage: '/images/activity-school-missions.svg',
     href: 'https://kenyayfc.org/project/school-missions/',
   },
   {
-    title: 'CPMK',
-    description: 'Community ministry and youth empowerment through CPMK initiatives.',
-    icon: Briefcase,
-    bgImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
+    title: 'Crisis Pregnancy Ministry',
+    description: 'Caring for mothers and babies through support, counseling and hope.',
+    icon: Heart,
+    bgImage: '/images/activity-crisis-pregnancy.svg',
     href: 'https://kenyayfc.org/project/cpmk/',
+  },
+  {
+    title: 'Bible Study',
+    description: 'Bible study gatherings that grow faith, community and discipleship.',
+    icon: BookOpen,
+    bgImage: '/images/activity-bible-study.svg',
+    href: 'https://kenyayfc.org/project/bible-study/',
   },
   {
     title: 'Kizazi Sasa Campsite',
     description: 'Retreats, camps and training in a safe, faith-filled environment.',
     icon: School,
-    bgImage: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+    bgImage: '/images/activity-kizazi-sasa-campsite.svg',
     href: 'https://kenyayfc.org/project/kizazi-sasa-campsite/',
   },
   {
     title: 'Digital Skills',
     description: 'Equipping young people with tech skills, digital literacy and creative media.',
-    icon: BookOpen,
-    bgImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+    icon: Briefcase,
+    bgImage: '/images/activity-digital-skills.svg',
     href: 'https://kenyayfc.org/project/digital-skills/',
   },
   {
     title: 'Sports Ministry',
     description: 'Building character, teamwork and faith through sports outreach.',
-    icon: Heart,
-    bgImage: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1200&q=80',
-    href: 'https://kenyayfc.org/project/sports-ministry/',
-  },
-  {
-    title: 'Leadership Training',
-    description: 'Developing leaders through mentoring, coaching and spiritual formation.',
     icon: UserCheck,
-    bgImage: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-    href: 'https://kenyayfc.org/',
+    bgImage: '/images/activity-sports-ministry.svg',
+    href: 'https://kenyayfc.org/project/sports-ministry/',
   },
 ];
 
@@ -190,12 +190,10 @@ export default function Index() {
           alt="Kenya Youth for Christ"
           className="absolute inset-0 h-full w-full object-cover opacity-75"
         />
-        <motion.img
+        <img
           src="/images/hero.jpg"
           alt="Kenya Youth for Christ"
           className="absolute inset-0 h-full w-full object-cover opacity-75"
-          animate={{ scale: [1.04, 1] }}
-          transition={{ duration: 30, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-950/60 to-slate-950/30" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
