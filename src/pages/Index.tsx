@@ -28,6 +28,8 @@ const defaultActivities: ActivityItem[] = [
   { title: 'Bible Schools', description: 'Training leaders with practical theology and outreach skills.', icon: BookOpen, bgImage: '/images/activity-bible-schools.jpg' },
   { title: 'Community Outreach', description: 'Feeding, counseling, and prayer for local families.', icon: Heart, bgImage: '/images/activity-community-outreach.jpg' },
   { title: 'Youth Camps', description: 'Campfires and worship nights that transform hearts.', icon: School, bgImage: '/images/activity-youth-camps.jpg' },
+  { title: 'Mission & Evangelism', description: 'Field evangelism and discipleship in unreached areas.', icon: Briefcase, bgImage: '/images/activity-mission.jpg' },
+  { title: 'Leadership Training', description: 'Intensive training for emerging youth leaders and mentors.', icon: UserCheck, bgImage: '/images/activity-leadership.jpg' },
 ];
 
 const statColors = [
@@ -97,6 +99,14 @@ export default function Index() {
   const [activities, setActivities] = useState(defaultActivities);
   const [testimonials, setTestimonials] = useState(defaultTestimonials);
   const [activeTestimonial, setActiveTestimonial] = useState<Testimonial | null>(null);
+  const [carouselInterval, setCarouselInterval] = useState(7000);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('carouselInterval');
+    if (saved) {
+      setCarouselInterval(parseInt(saved));
+    }
+  }, []);
 
   const editHero = () => {
     if (!isEditMode) return;
@@ -164,7 +174,7 @@ export default function Index() {
                 <p className="text-base sm:text-lg leading-relaxed text-slate-100 max-w-2xl">{heroText}</p>
                 <div className="inline-flex">
                   <span className="inline-flex items-center rounded-full bg-sky-500/20 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-sky-100 ring-1 ring-sky-400/30">
-                    Current year totals • {latestYear}
+                    Current Year totals • {latestYear}
                   </span>
                 </div>
               </div>
@@ -203,29 +213,29 @@ export default function Index() {
 
       <section id="stories-activities" className="px-4 py-16 sm:py-20 md:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid gap-12 lg:gap-16 lg:grid-cols-2">
+          <div className="grid gap-12 lg:gap-16">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: -30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="flex flex-col order-2 lg:order-1"
+              className="flex flex-col"
             >
               <div className="mb-10">
                 <p className="text-sm uppercase tracking-wider font-semibold text-sky-600">Stories of change</p>
                 <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-display font-bold text-slate-900 leading-tight">Real voices from the field</h2>
               </div>
               <div className="flex-1">
-                <TestimoniesHeroCarousel testimonials={testimonials} autoPlayInterval={5000} onReadMore={setActiveTestimonial} />
+                <TestimoniesHeroCarousel testimonials={testimonials} autoPlayInterval={carouselInterval} onReadMore={setActiveTestimonial} />
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="flex flex-col order-1 lg:order-2"
+              className="flex flex-col"
             >
               <div className="mb-10">
                 <p className="text-sm uppercase tracking-wider font-semibold text-sky-600">Our initiatives</p>

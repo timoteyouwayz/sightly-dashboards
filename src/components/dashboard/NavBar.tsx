@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Menu, BarChart3, GitCompare } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
 import { useMinistryData } from '@/contexts/MinistryDataContext';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -55,13 +54,9 @@ export const NavBar = () => {
 
           <div className="hidden md:flex items-center gap-1">
             <NavLinks />
-            <div className="ml-2 pl-2 border-l border-border">
-              <ThemeToggle />
-            </div>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            <ThemeToggle />
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9">
